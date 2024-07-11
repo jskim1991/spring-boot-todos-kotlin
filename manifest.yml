@@ -1,0 +1,10 @@
+applications:
+  - name: jay-todos
+    instances: 1
+    memory: 1G
+    path: ./build/libs/todos-0.0.1-SNAPSHOT.jar
+    health-check-type: http
+    health-check-http-endpoint: /health
+    health-check-invocation-timeout: 30
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
