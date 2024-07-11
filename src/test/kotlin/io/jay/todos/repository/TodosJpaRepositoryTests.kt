@@ -23,6 +23,7 @@ class TodosJpaRepositoryTests {
     fun `findAll returns all records`() {
         val actual = todosJpaRepository.findAll()
 
+
         assertThat(actual.size, equalTo(1))
     }
 
@@ -30,6 +31,7 @@ class TodosJpaRepositoryTests {
     fun `two identical must be equal`() {
         val one = TodoEntity(1, "Learn Kotlin", true)
         val two = TodoEntity(1, "Learn Kotlin", true)
+
 
         assertThat(one == two, equalTo(true))
     }

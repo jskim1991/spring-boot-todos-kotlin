@@ -37,6 +37,7 @@ class DefaultTodosRepositoryTests {
             TodoEntity(1, "Learn Kotlin", true)
         )
 
+
         val actual = todosRepository.findAll()
 
 
