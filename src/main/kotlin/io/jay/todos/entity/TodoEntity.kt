@@ -2,13 +2,14 @@ package io.jay.todos.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "todos")
+@Table(name = "todo")
 class TodoEntity(
-    @Id @GeneratedValue val id: Int?,
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int?,
     val description: String,
     val finished: Boolean) {
 
