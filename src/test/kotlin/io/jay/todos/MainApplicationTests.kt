@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.jay.todos.controller.dto.TodoResponse
 import io.jay.todos.entity.TodoEntity
-import io.jay.todos.repository.TodosJpaRepository
+import io.jay.todos.repository.TodoJpaRepository
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 class MainApplicationTests {
 
     @Autowired
-    private lateinit var todosJpaRepository: TodosJpaRepository
+    private lateinit var todoJpaRepository: TodoJpaRepository
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -35,7 +35,7 @@ class MainApplicationTests {
 
     @Test
     fun `end to end`() {
-        todosJpaRepository.save(TodoEntity(null, "Learn Kotlin", true))
+        todoJpaRepository.save(TodoEntity(null, "Learn Kotlin", true))
 
 
         var jsonResponse = mockMvc.perform(get("/api/todos"))

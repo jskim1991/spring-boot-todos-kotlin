@@ -1,67 +1,128 @@
 package io.jay.todos.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.jay.todos.controller.dto.NewTodoRequest
+import io.jay.todos.controller.dto.TodoResponse
 import io.jay.todos.model.Todo
-import io.jay.todos.service.TodosService
+import io.jay.todos.service.TodoService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 class TodosControllerTests {
 
     private lateinit var mockMvc: MockMvc
-    private lateinit var mockTodosService: TodosService
+    private lateinit var mockTodoService: TodoService
+    private val objectMapper = ObjectMapper()
 
     @BeforeEach
     fun setUp() {
-        mockTodosService = mockk()
-        mockMvc = MockMvcBuilders.standaloneSetup(TodosController(mockTodosService)).build()
+        mockTodoService = mockk()
+        mockMvc = MockMvcBuilders.standaloneSetup(TodosController(mockTodoService)).build()
     }
 
-    @Test
-    fun `get should return 200 OK`() {
-        every { mockTodosService.getAll() } returns emptyList()
+    @Nested
+    inner class GetAll {
+        @Test
+        fun `should return 200 OK`() {
+            every { mockTodoService.getAll() } returns emptyList()
 
 
-        mockMvc.get("/api/todos")
-            .andExpect {
-                status { isOk() }
-            }
+            mockMvc.perform(get("/api/todos"))
+                .andExpect(status().isOk)
+        }
+
+        @Test
+        fun `should call todos service`() {
+            every { mockTodoService.getAll() } returns emptyList()
+
+
+            mockMvc.perform(get("/api/todos"))
+
+
+            verify { mockTodoService.getAll() }
+        }
+
+        @Test
+        fun `should return list of todos`() {
+            every { mockTodoService.getAll() } returns listOf(
+                Todo(1, "Learn Kotlin", true)
+            )
+
+            val expectedJson = """
+                [
+                    {
+                        "id": 1,
+                        "description": "Learn Kotlin",
+                        "finished": true
+                    }
+                ]
+            """.trimIndent()
+
+
+            mockMvc.perform(get("/api/todos"))
+                .andExpect(content().json(expectedJson, true))
+        }
     }
 
-    @Test
-    fun `get should call todos service`() {
-        every { mockTodosService.getAll() } returns emptyList()
+    @Nested
+    inner class CreateTodo {
+        val newTodoRequest = NewTodoRequest("Learn Kotlin")
+        val requestBody = objectMapper.writeValueAsString(newTodoRequest)
+
+        @Test
+        fun `should return 201`() {
+            every { mockTodoService.create(any()) } returns Todo(1, "Learn Kotlin", false)
 
 
-        mockMvc.get("/api/todos")
+            mockMvc.perform(post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isCreated)
+        }
+
+        @Test
+        fun `should call todoService`() {
+            every { mockTodoService.create(newTodoRequest) } returns Todo(1, "Learn Kotlin", false)
 
 
-        verify { mockTodosService.getAll() }
+            mockMvc.perform(post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+
+
+            verify { mockTodoService.create(newTodoRequest) }
+        }
+
+        @Test
+        fun `should return created todo`() {
+            every { mockTodoService.create(any()) } returns Todo(1, "Learn Kotlin", false)
+
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Learn Kotlin",
+                    "finished": false
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(content().json(expectedJson, true))
+        }
     }
 
-    @Test
-    fun `get should return list of todos`() {
-        every { mockTodosService.getAll() } returns listOf(
-            Todo(1, "Learn Kotlin", true)
-        )
-
-
-        mockMvc.get("/api/todos")
-            .andExpect {
-                content { contentType(MediaType.APPLICATION_JSON) }
-                content { jsonPath("$.length()", equalTo(1)) }
-                content { jsonPath("$[0].id", equalTo(1)) }
-                content { jsonPath("$[0].description", equalTo("Learn Kotlin")) }
-                content { jsonPath("$[0].finished", equalTo(true)) }
-            }
-    }
 }

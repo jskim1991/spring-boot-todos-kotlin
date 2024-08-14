@@ -9,19 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 
 @DataJpaTest
-class TodosJpaRepositoryTests {
+class TodoJpaRepositoryTests {
 
     @Autowired
-    private lateinit var todosJpaRepository: TodosJpaRepository
+    private lateinit var todoJpaRepository: TodoJpaRepository
 
     @BeforeEach
     fun setUp() {
-        todosJpaRepository.save(TodoEntity(null, "Learn Kotlin", true))
+        todoJpaRepository.save(TodoEntity(null, "Learn Kotlin", true))
     }
 
     @Test
     fun `findAll returns all records`() {
-        val actual = todosJpaRepository.findAll()
+        val actual = todoJpaRepository.findAll()
 
 
         assertThat(actual.size, equalTo(1))

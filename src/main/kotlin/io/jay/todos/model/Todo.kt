@@ -1,5 +1,8 @@
 package io.jay.todos.model
 
-class Todo(val id: Int,
+data class Todo(val id: Int?,
            val description: String,
-           val finished: Boolean)
+           val finished: Boolean) {
+
+    constructor(description: String) : this(null, description, false)
+}
