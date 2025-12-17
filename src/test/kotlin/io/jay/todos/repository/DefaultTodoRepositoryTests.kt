@@ -89,9 +89,7 @@ class DefaultTodoRepositoryTests {
         fun `should call jpa repository to delete by id`() {
             every { mockTodoJpaRepository.deleteById(1) } returns Unit
 
-
             todoRepository.deleteById(1)
-
 
             verify { mockTodoJpaRepository.deleteById(1) }
         }

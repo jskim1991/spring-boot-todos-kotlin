@@ -87,9 +87,7 @@ class DefaultTodoServiceTests {
         fun `should call repository to delete by id`() {
             every { mockTodoRepository.deleteById(1) } returns Unit
 
-
             todoService.deleteById(1)
-
 
             verify { mockTodoRepository.deleteById(1) }
         }
