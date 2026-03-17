@@ -13,7 +13,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -51,5 +53,23 @@ class MainApplicationTests {
         assertThat(actual.id, equalTo(1))
         assertThat(actual.description, equalTo("Learn Kotlin"))
         assertThat(actual.finished, equalTo(true))
+    }
+
+    @Test
+    fun `delete todo end to end`() {
+        val saved = todoJpaRepository.save(TodoEntity(null, "Learn Kotlin", false))
+
+
+        mockMvc.perform(delete("/api/todos/${saved.id}"))
+            .andExpect(status().isNoContent)
+
+
+        val jsonResponse = mockMvc.perform(get("/api/todos"))
+            .andReturn()
+            .response
+            .contentAsString
+
+        val result = objectMapper.readValue<List<TodoResponse>>(jsonResponse)
+        assertThat(result.size, equalTo(0))
     }
 }
