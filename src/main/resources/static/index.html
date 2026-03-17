@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos</title>
+</head>
+<body>
+    <h1>Todos</h1>
+
+    <div>
+        <input type="text" id="todoInput" placeholder="할 일을 입력하세요" />
+        <button id="createButton" onclick="createTodo()">생성</button>
+    </div>
+
+    <ul id="todoList"></ul>
+
+    <script>
+        async function loadTodos() {
+            const response = await fetch('/api/todos');
+            const todos = await response.json();
+            renderTodos(todos);
+        }
+
+        function renderTodos(todos) {
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = '';
+            todos.forEach(function(todo) {
+                const li = document.createElement('li');
+                li.textContent = todo.description;
+                todoList.appendChild(li);
+            });
+        }
+
+        async function createTodo() {
+            const input = document.getElementById('todoInput');
+            const description = input.value.trim();
+            if (!description) {
+                return;
+            }
+
+            await fetch('/api/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ description: description })
+            });
+
+            input.value = '';
+            await loadTodos();
+        }
+
+        loadTodos();
+    </script>
+</body>
+</html>
