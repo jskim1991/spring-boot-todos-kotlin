@@ -2,11 +2,15 @@ package io.jay.todos.controller
 
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
+import io.jay.todos.controller.dto.UpdateTodoRequest
 import io.jay.todos.service.TodoService
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
@@ -29,6 +33,19 @@ class TodosController(private val todoService: TodoService) {
     fun createTodo(@RequestBody newTodoRequest: NewTodoRequest): TodoResponse {
         val created = todoService.create(newTodoRequest)
         return TodoResponse(created.id!!, created.description, created.finished)
+    }
+
+    @PutMapping("/{id}")
+    fun updateTodoDescription(
+        @PathVariable id: Int,
+        @RequestBody updateTodoRequest: UpdateTodoRequest
+    ): ResponseEntity<TodoResponse> {
+        val updated = todoService.updateDescription(id, updateTodoRequest)
+        return if (updated != null) {
+            ResponseEntity.ok(TodoResponse(updated.id!!, updated.description, updated.finished))
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
 
