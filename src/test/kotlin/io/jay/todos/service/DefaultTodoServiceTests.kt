@@ -80,4 +80,18 @@ class DefaultTodoServiceTests {
             assertThat(actual.finished, equalTo(false))
         }
     }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call repository to delete by id`() {
+            every { mockTodoRepository.deleteById(1) } returns Unit
+
+
+            todoService.delete(1)
+
+
+            verify { mockTodoRepository.deleteById(1) }
+        }
+    }
 }
