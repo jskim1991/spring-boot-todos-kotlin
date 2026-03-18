@@ -1,6 +1,7 @@
 package io.jay.todos.service
 
 import io.jay.todos.controller.dto.NewTodoRequest
+import io.jay.todos.controller.dto.UpdateTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
 import io.mockk.every
@@ -8,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -78,6 +80,44 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class UpdateDescription {
+        @Test
+        fun `should call repository to update description`() {
+            every { mockTodoRepository.updateDescription(1, "Updated description") } returns Todo(1, "Updated description", false)
+
+
+            todoService.updateDescription(1, UpdateTodoRequest("Updated description"))
+
+
+            verify { mockTodoRepository.updateDescription(1, "Updated description") }
+        }
+
+        @Test
+        fun `should return updated todo when todo exists`() {
+            every { mockTodoRepository.updateDescription(1, "Updated description") } returns Todo(1, "Updated description", false)
+
+
+            val actual = todoService.updateDescription(1, UpdateTodoRequest("Updated description"))
+
+
+            assertThat(actual?.id, equalTo(1))
+            assertThat(actual?.description, equalTo("Updated description"))
+            assertThat(actual?.finished, equalTo(false))
+        }
+
+        @Test
+        fun `should return null when todo does not exist`() {
+            every { mockTodoRepository.updateDescription(1, "Updated description") } returns null
+
+
+            val actual = todoService.updateDescription(1, UpdateTodoRequest("Updated description"))
+
+
+            assertThat(actual, nullValue())
         }
     }
 }
