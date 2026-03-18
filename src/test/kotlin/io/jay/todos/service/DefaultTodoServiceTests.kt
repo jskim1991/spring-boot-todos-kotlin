@@ -4,6 +4,7 @@ import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
@@ -78,6 +79,20 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class DeleteById {
+        @Test
+        fun `should call repository to delete by id`() {
+            justRun { mockTodoRepository.deleteById(1) }
+
+
+            todoService.deleteById(1)
+
+
+            verify { mockTodoRepository.deleteById(1) }
         }
     }
 }
