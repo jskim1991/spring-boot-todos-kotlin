@@ -3,6 +3,8 @@ package io.jay.todos.service
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
+import io.mockk.just
+import io.mockk.runs
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -78,6 +80,18 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call repository delete`() {
+            every { mockTodoRepository.delete(1) } just runs
+
+            todoService.delete(1)
+
+            verify { mockTodoRepository.delete(1) }
         }
     }
 }

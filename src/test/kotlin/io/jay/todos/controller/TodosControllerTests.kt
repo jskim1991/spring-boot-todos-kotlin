@@ -5,6 +5,8 @@ import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
 import io.jay.todos.model.Todo
 import io.jay.todos.service.TodoService
+import io.mockk.just
+import io.mockk.runs
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -122,6 +125,26 @@ class TodosControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(content().json(expectedJson, true))
+        }
+    }
+
+    @Nested
+    inner class DeleteTodo {
+        @Test
+        fun `should return 204 No Content`() {
+            every { mockTodoService.delete(1) } just runs
+
+            mockMvc.perform(delete("/api/todos/1"))
+                .andExpect(status().isNoContent)
+        }
+
+        @Test
+        fun `should call todoService delete`() {
+            every { mockTodoService.delete(1) } just runs
+
+            mockMvc.perform(delete("/api/todos/1"))
+
+            verify { mockTodoService.delete(1) }
         }
     }
 
