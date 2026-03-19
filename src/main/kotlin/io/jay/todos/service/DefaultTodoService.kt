@@ -1,6 +1,7 @@
 package io.jay.todos.service
 
 import io.jay.todos.controller.dto.NewTodoRequest
+import io.jay.todos.controller.dto.UpdateTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
 import org.springframework.stereotype.Service
@@ -15,7 +16,7 @@ class DefaultTodoService(private val todoRepository: TodoRepository) : TodoServi
         return todoRepository.save(Todo(newTodoRequest.description))
     }
 
-    override fun update(id: Int, description: String): Todo? {
-        return todoRepository.update(id, description)
+    override fun update(id: Int, updateTodoRequest: UpdateTodoRequest): Todo? {
+        return todoRepository.update(id, updateTodoRequest.description)
     }
 }

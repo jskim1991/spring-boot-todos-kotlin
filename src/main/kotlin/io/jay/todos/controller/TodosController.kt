@@ -37,7 +37,7 @@ class TodosController(private val todoService: TodoService) {
 
     @PutMapping("/{id}")
     fun updateTodo(@PathVariable id: Int, @RequestBody updateTodoRequest: UpdateTodoRequest): ResponseEntity<TodoResponse> {
-        val updated = todoService.update(id, updateTodoRequest.description)
+        val updated = todoService.update(id, updateTodoRequest)
         return if (updated != null) {
             ResponseEntity.ok(TodoResponse(updated.id!!, updated.description, updated.finished))
         } else {

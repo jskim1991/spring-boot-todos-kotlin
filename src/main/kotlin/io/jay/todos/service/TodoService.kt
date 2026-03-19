@@ -1,11 +1,12 @@
 package io.jay.todos.service
 
 import io.jay.todos.controller.dto.NewTodoRequest
+import io.jay.todos.controller.dto.UpdateTodoRequest
 import io.jay.todos.model.Todo
 
 interface TodoService {
 
     fun getAll(): List<Todo>
     fun create(newTodoRequest: NewTodoRequest): Todo
-    fun update(id: Int, description: String): Todo?
+    fun update(id: Int, updateTodoRequest: UpdateTodoRequest): Todo?
 }
