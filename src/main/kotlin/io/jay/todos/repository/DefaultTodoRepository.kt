@@ -17,4 +17,26 @@ class DefaultTodoRepository(private val todoJpaRepository: TodoJpaRepository) : 
         val created = todoJpaRepository.save(TodoEntity(todo.id, todo.description, todo.finished))
         return Todo(created.id!!, created.description, created.finished)
     }
+
+    override fun findById(id: Int): Todo? {
+        val entity = todoJpaRepository.findById(id)
+        return if (entity.isPresent) {
+            val todoEntity = entity.get()
+            Todo(todoEntity.id!!, todoEntity.description, todoEntity.finished)
+        } else {
+            null
+        }
+    }
+
+    override fun update(id: Int, description: String): Todo? {
+        val entity = todoJpaRepository.findById(id)
+        return if (entity.isPresent) {
+            val todoEntity = entity.get()
+            todoEntity.description = description
+            val updated = todoJpaRepository.save(todoEntity)
+            Todo(updated.id!!, updated.description, updated.finished)
+        } else {
+            null
+        }
+    }
 }
