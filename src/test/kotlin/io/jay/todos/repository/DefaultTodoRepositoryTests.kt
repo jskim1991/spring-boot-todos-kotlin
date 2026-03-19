@@ -7,9 +7,11 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.util.Optional
 
 class DefaultTodoRepositoryTests {
 
@@ -80,6 +82,103 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class FindById {
+        @Test
+        fun `should call jpa repository to find by id`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(TodoEntity(1, "Learn Kotlin", true))
+
+
+            todoRepository.findById(1)
+
+
+            verify { mockTodoJpaRepository.findById(1) }
+        }
+
+        @Test
+        fun `should return todo when found`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(TodoEntity(1, "Learn Kotlin", true))
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual?.id, equalTo(1))
+            assertThat(actual?.description, equalTo("Learn Kotlin"))
+            assertThat(actual?.finished, equalTo(true))
+        }
+
+        @Test
+        fun `should return null when not found`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.empty()
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual, nullValue())
+        }
+    }
+
+    @Nested
+    inner class Update {
+        @Test
+        fun `should call jpa repository to find and save when updating`() {
+            val existingEntity = TodoEntity(1, "Learn Kotlin", false)
+            val updatedEntity = TodoEntity(1, "Learn Spring Boot", false)
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(existingEntity)
+            every { mockTodoJpaRepository.save(updatedEntity) } returns updatedEntity
+
+
+            todoRepository.update(1, "Learn Spring Boot")
+
+
+            verify { mockTodoJpaRepository.findById(1) }
+            verify { mockTodoJpaRepository.save(updatedEntity) }
+        }
+
+        @Test
+        fun `should return updated todo when found`() {
+            val existingEntity = TodoEntity(1, "Learn Kotlin", false)
+            val updatedEntity = TodoEntity(1, "Learn Spring Boot", false)
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(existingEntity)
+            every { mockTodoJpaRepository.save(updatedEntity) } returns updatedEntity
+
+
+            val actual = todoRepository.update(1, "Learn Spring Boot")
+
+
+            assertThat(actual?.id, equalTo(1))
+            assertThat(actual?.description, equalTo("Learn Spring Boot"))
+            assertThat(actual?.finished, equalTo(false))
+        }
+
+        @Test
+        fun `should return null when todo not found`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.empty()
+
+
+            val actual = todoRepository.update(1, "Learn Spring Boot")
+
+
+            assertThat(actual, nullValue())
+        }
+
+        @Test
+        fun `should preserve finished status when updating description`() {
+            val existingEntity = TodoEntity(1, "Learn Kotlin", true)
+            val updatedEntity = TodoEntity(1, "Learn Spring Boot", true)
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(existingEntity)
+            every { mockTodoJpaRepository.save(updatedEntity) } returns updatedEntity
+
+
+            val actual = todoRepository.update(1, "Learn Spring Boot")
+
+
+            assertThat(actual?.finished, equalTo(true))
         }
     }
 }

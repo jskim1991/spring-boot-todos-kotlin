@@ -3,6 +3,7 @@ package io.jay.todos.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
+import io.jay.todos.controller.dto.UpdateTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.service.TodoService
 import io.mockk.every
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -119,6 +121,85 @@ class TodosControllerTests {
 
 
             mockMvc.perform(post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(content().json(expectedJson, true))
+        }
+    }
+
+    @Nested
+    inner class UpdateTodo {
+        val updateTodoRequest = UpdateTodoRequest("Learn Spring Boot")
+        val requestBody = objectMapper.writeValueAsString(updateTodoRequest)
+
+        @Test
+        fun `should return 200 OK when todo is updated`() {
+            every { mockTodoService.update(1, updateTodoRequest) } returns Todo(1, "Learn Spring Boot", false)
+
+
+            mockMvc.perform(put("/api/todos/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk)
+        }
+
+        @Test
+        fun `should return 404 when todo not found`() {
+            every { mockTodoService.update(1, updateTodoRequest) } returns null
+
+
+            mockMvc.perform(put("/api/todos/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isNotFound)
+        }
+
+        @Test
+        fun `should call todoService with correct parameters`() {
+            every { mockTodoService.update(1, updateTodoRequest) } returns Todo(1, "Learn Spring Boot", false)
+
+
+            mockMvc.perform(put("/api/todos/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+
+
+            verify { mockTodoService.update(1, updateTodoRequest) }
+        }
+
+        @Test
+        fun `should return updated todo`() {
+            every { mockTodoService.update(1, updateTodoRequest) } returns Todo(1, "Learn Spring Boot", false)
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Learn Spring Boot",
+                    "finished": false
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(put("/api/todos/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(content().json(expectedJson, true))
+        }
+
+        @Test
+        fun `should preserve finished status when updating`() {
+            every { mockTodoService.update(1, updateTodoRequest) } returns Todo(1, "Learn Spring Boot", true)
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Learn Spring Boot",
+                    "finished": true
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(put("/api/todos/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(content().json(expectedJson, true))
