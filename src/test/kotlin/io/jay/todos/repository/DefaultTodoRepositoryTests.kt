@@ -82,4 +82,42 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.finished, equalTo(false))
         }
     }
+
+    @Nested
+    inner class FindById {
+        @Test
+        fun `should call jpa repository to find by id`() {
+            every { mockTodoJpaRepository.findById(1) } returns java.util.Optional.of(TodoEntity(1, "Learn Kotlin", false))
+
+
+            todoRepository.findById(1)
+
+
+            verify { mockTodoJpaRepository.findById(1) }
+        }
+
+        @Test
+        fun `should return mapped todo when found`() {
+            every { mockTodoJpaRepository.findById(1) } returns java.util.Optional.of(TodoEntity(1, "Learn Kotlin", true))
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual?.id, equalTo(1))
+            assertThat(actual?.description, equalTo("Learn Kotlin"))
+            assertThat(actual?.finished, equalTo(true))
+        }
+
+        @Test
+        fun `should return null when not found`() {
+            every { mockTodoJpaRepository.findById(1) } returns java.util.Optional.empty()
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual, equalTo(null))
+        }
+    }
 }
