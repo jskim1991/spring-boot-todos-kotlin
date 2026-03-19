@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 @Table(name = "todo")
 class TodoEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int?,
-    val description: String,
+    var description: String,
     val finished: Boolean) {
 
     override fun equals(other: Any?): Boolean {
