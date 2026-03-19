@@ -20,7 +20,7 @@ class TodosController(private val todoService: TodoService) {
     @GetMapping
     fun getAll(): List<TodoResponse> {
         return todoService.getAll().map {
-            TodoResponse(it.id!!, it.description, it.finished)
+            TodoResponse(it.id!!, it.description, it.finished, it.priority)
         }
     }
 
@@ -28,7 +28,7 @@ class TodosController(private val todoService: TodoService) {
     @ResponseStatus(CREATED)
     fun createTodo(@RequestBody newTodoRequest: NewTodoRequest): TodoResponse {
         val created = todoService.create(newTodoRequest)
-        return TodoResponse(created.id!!, created.description, created.finished)
+        return TodoResponse(created.id!!, created.description, created.finished, created.priority)
     }
 
 

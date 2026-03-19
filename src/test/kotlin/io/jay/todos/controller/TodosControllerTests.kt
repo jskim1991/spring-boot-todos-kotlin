@@ -3,6 +3,7 @@ package io.jay.todos.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
+import io.jay.todos.model.Priority
 import io.jay.todos.model.Todo
 import io.jay.todos.service.TodoService
 import io.mockk.every
@@ -73,6 +74,28 @@ class TodosControllerTests {
             mockMvc.perform(get("/api/todos"))
                 .andExpect(content().json(expectedJson, true))
         }
+
+        @Test
+        fun `should return priority when set`() {
+            every { mockTodoService.getAll() } returns listOf(
+                Todo(1, "Learn Kotlin", false, Priority.HIGH)
+            )
+
+            val expectedJson = """
+                [
+                    {
+                        "id": 1,
+                        "description": "Learn Kotlin",
+                        "finished": false,
+                        "priority": "HIGH"
+                    }
+                ]
+            """.trimIndent()
+
+
+            mockMvc.perform(get("/api/todos"))
+                .andExpect(content().json(expectedJson, true))
+        }
     }
 
     @Nested
@@ -121,6 +144,29 @@ class TodosControllerTests {
             mockMvc.perform(post("/api/todos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
+                .andExpect(content().json(expectedJson, true))
+        }
+
+        @Test
+        fun `should create todo with priority`() {
+            val requestWithPriority = NewTodoRequest("Learn Kotlin", Priority.MEDIUM)
+            val requestBodyWithPriority = objectMapper.writeValueAsString(requestWithPriority)
+            every { mockTodoService.create(requestWithPriority) } returns Todo(1, "Learn Kotlin", false, Priority.MEDIUM)
+
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Learn Kotlin",
+                    "finished": false,
+                    "priority": "MEDIUM"
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyWithPriority))
                 .andExpect(content().json(expectedJson, true))
         }
     }

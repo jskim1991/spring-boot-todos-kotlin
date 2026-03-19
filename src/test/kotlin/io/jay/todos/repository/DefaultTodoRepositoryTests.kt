@@ -1,6 +1,7 @@
 package io.jay.todos.repository
 
 import io.jay.todos.entity.TodoEntity
+import io.jay.todos.model.Priority
 import io.jay.todos.model.Todo
 import io.mockk.every
 import io.mockk.mockk
@@ -51,6 +52,19 @@ class DefaultTodoRepositoryTests {
             assertThat(todo.description, equalTo("Learn Kotlin"))
             assertThat(todo.finished, equalTo(true))
         }
+
+        @Test
+        fun `should return priority from entity`() {
+            every { mockTodoJpaRepository.findAll() } returns listOf(
+                TodoEntity(1, "Learn Kotlin", false, Priority.HIGH)
+            )
+
+
+            val actual = todoRepository.findAll()
+
+
+            assertThat(actual[0].priority, equalTo(Priority.HIGH))
+        }
     }
 
     @Nested
@@ -80,6 +94,19 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+
+        @Test
+        fun `should save and return todo with priority`() {
+            val entityWithPriority = TodoEntity(null, "Learn Kotlin", false, Priority.MEDIUM)
+            every { mockTodoJpaRepository.save(entityWithPriority) } returns TodoEntity(1, "Learn Kotlin", false, Priority.MEDIUM)
+
+
+            val actual = todoRepository.save(Todo(null, "Learn Kotlin", false, Priority.MEDIUM))
+
+
+            verify { mockTodoJpaRepository.save(entityWithPriority) }
+            assertThat(actual.priority, equalTo(Priority.MEDIUM))
         }
     }
 }

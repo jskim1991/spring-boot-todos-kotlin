@@ -1,6 +1,7 @@
 package io.jay.todos.service
 
 import io.jay.todos.controller.dto.NewTodoRequest
+import io.jay.todos.model.Priority
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
 import io.mockk.every
@@ -78,6 +79,18 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+
+        @Test
+        fun `should pass priority to repository when creating todo`() {
+            every { mockTodoRepository.save(any()) } returns Todo(1, "Learn Kotlin", false, Priority.LOW)
+
+
+            val actual = todoService.create(NewTodoRequest("Learn Kotlin", Priority.LOW))
+
+
+            verify { mockTodoRepository.save(Todo(null, "Learn Kotlin", false, Priority.LOW)) }
+            assertThat(actual.priority, equalTo(Priority.LOW))
         }
     }
 }
