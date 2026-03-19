@@ -7,9 +7,11 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class DefaultTodoRepositoryTests {
 
@@ -80,6 +82,44 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class FindById {
+        @Test
+        fun `should call jpa repository to find by id`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(TodoEntity(1, "Learn Kotlin", false))
+
+
+            todoRepository.findById(1)
+
+
+            verify { mockTodoJpaRepository.findById(1) }
+        }
+
+        @Test
+        fun `should return todo when found`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(TodoEntity(1, "Learn Kotlin", false))
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual!!.id, equalTo(1))
+            assertThat(actual.description, equalTo("Learn Kotlin"))
+            assertThat(actual.finished, equalTo(false))
+        }
+
+        @Test
+        fun `should return null when todo not found`() {
+            every { mockTodoJpaRepository.findById(999) } returns Optional.empty()
+
+
+            val actual = todoRepository.findById(999)
+
+
+            assertThat(actual, nullValue())
         }
     }
 }
