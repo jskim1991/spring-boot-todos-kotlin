@@ -80,4 +80,44 @@ class DefaultTodoServiceTests {
             assertThat(actual.finished, equalTo(false))
         }
     }
+
+    @Nested
+    inner class UpdateDescription {
+        @Test
+        fun `should return null when todo does not exist`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            val actual = todoService.updateDescription(1, "Updated description")
+
+
+            assertThat(actual, equalTo(null))
+        }
+
+        @Test
+        fun `should call repository to save with updated description`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", false)
+            every { mockTodoRepository.save(Todo(1, "Updated description", false)) } returns Todo(1, "Updated description", false)
+
+
+            todoService.updateDescription(1, "Updated description")
+
+
+            verify { mockTodoRepository.save(Todo(1, "Updated description", false)) }
+        }
+
+        @Test
+        fun `should return updated todo`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", false)
+            every { mockTodoRepository.save(any()) } returns Todo(1, "Updated description", false)
+
+
+            val actual = todoService.updateDescription(1, "Updated description")
+
+
+            assertThat(actual?.id, equalTo(1))
+            assertThat(actual?.description, equalTo("Updated description"))
+            assertThat(actual?.finished, equalTo(false))
+        }
+    }
 }

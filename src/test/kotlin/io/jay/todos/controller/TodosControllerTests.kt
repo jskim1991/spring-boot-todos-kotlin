@@ -3,6 +3,7 @@ package io.jay.todos.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
+import io.jay.todos.controller.dto.UpdateTodoDescriptionRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.service.TodoService
 import io.mockk.every
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -119,6 +121,67 @@ class TodosControllerTests {
 
 
             mockMvc.perform(post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(content().json(expectedJson, true))
+        }
+    }
+
+    @Nested
+    inner class UpdateDescription {
+        val updateRequest = UpdateTodoDescriptionRequest("Updated description")
+        val requestBody = objectMapper.writeValueAsString(updateRequest)
+
+        @Test
+        fun `should return 200 OK when todo exists`() {
+            every { mockTodoService.updateDescription(1, "Updated description") } returns Todo(1, "Updated description", false)
+
+
+            mockMvc.perform(patch("/api/todos/1/description")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk)
+        }
+
+        @Test
+        fun `should return 404 when todo does not exist`() {
+            every { mockTodoService.updateDescription(1, "Updated description") } returns null
+
+
+            mockMvc.perform(patch("/api/todos/1/description")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isNotFound)
+        }
+
+        @Test
+        fun `should call todoService`() {
+            every { mockTodoService.updateDescription(1, "Updated description") } returns Todo(1, "Updated description", false)
+
+
+            mockMvc.perform(patch("/api/todos/1/description")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+
+
+            verify { mockTodoService.updateDescription(1, "Updated description") }
+        }
+
+        @Test
+        fun `should return updated todo`() {
+            every { mockTodoService.updateDescription(1, "Updated description") } returns Todo(1, "Updated description", false)
+
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Updated description",
+                    "finished": false
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(patch("/api/todos/1/description")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(content().json(expectedJson, true))
