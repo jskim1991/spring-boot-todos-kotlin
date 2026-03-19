@@ -1,5 +1,6 @@
 package io.jay.todos.service
 
+import io.jay.todos.controller.dto.AssignLabelRequest
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
@@ -11,6 +12,8 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.web.server.ResponseStatusException
 
 class DefaultTodoServiceTests {
 
@@ -78,6 +81,43 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class AssignLabel {
+        @Test
+        fun `should call repository to save with label`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", false)
+            every { mockTodoRepository.save(any()) } returns Todo(1, "Learn Kotlin", false, "work")
+
+
+            todoService.assignLabel(1, AssignLabelRequest("work"))
+
+
+            verify { mockTodoRepository.save(Todo(1, "Learn Kotlin", false, "work")) }
+        }
+
+        @Test
+        fun `should return todo with label`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", false)
+            every { mockTodoRepository.save(any()) } returns Todo(1, "Learn Kotlin", false, "work")
+
+
+            val actual = todoService.assignLabel(1, AssignLabelRequest("work"))
+
+
+            assertThat(actual.label, equalTo("work"))
+        }
+
+        @Test
+        fun `should throw 404 when todo not found`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            assertThrows<ResponseStatusException> {
+                todoService.assignLabel(1, AssignLabelRequest("work"))
+            }
         }
     }
 }

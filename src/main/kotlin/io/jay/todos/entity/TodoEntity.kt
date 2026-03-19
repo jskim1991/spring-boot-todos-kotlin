@@ -11,7 +11,8 @@ import jakarta.persistence.Table
 class TodoEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int?,
     val description: String,
-    val finished: Boolean) {
+    val finished: Boolean,
+    val label: String? = null) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -20,6 +21,7 @@ class TodoEntity(
         if (id != other.id) return false
         if (description != other.description) return false
         if (finished != other.finished) return false
+        if (label != other.label) return false
 
         return true
     }
@@ -28,6 +30,7 @@ class TodoEntity(
         var result = id ?: 0
         result = 31 * result + description.hashCode()
         result = 31 * result + finished.hashCode()
+        result = 31 * result + (label?.hashCode() ?: 0)
         return result
     }
 }
