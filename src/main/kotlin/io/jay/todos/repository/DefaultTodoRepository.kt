@@ -13,6 +13,12 @@ class DefaultTodoRepository(private val todoJpaRepository: TodoJpaRepository) : 
             }
     }
 
+    override fun findById(id: Int): Todo? {
+        return todoJpaRepository.findById(id)
+            .map { Todo(it.id!!, it.description, it.finished) }
+            .orElse(null)
+    }
+
     override fun save(todo: Todo): Todo {
         val created = todoJpaRepository.save(TodoEntity(todo.id, todo.description, todo.finished))
         return Todo(created.id!!, created.description, created.finished)
