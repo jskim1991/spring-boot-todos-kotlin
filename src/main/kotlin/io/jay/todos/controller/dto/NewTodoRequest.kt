@@ -1,3 +1,5 @@
 package io.jay.todos.controller.dto
 
-data class NewTodoRequest(val description: String)
+import io.jay.todos.model.Priority
+
+data class NewTodoRequest(val description: String, val priority: Priority? = null)

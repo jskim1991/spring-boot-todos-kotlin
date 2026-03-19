@@ -9,12 +9,12 @@ class DefaultTodoRepository(private val todoJpaRepository: TodoJpaRepository) : 
     override fun findAll(): List<Todo> {
         return todoJpaRepository.findAll()
             .map { todoEntity ->
-                Todo(todoEntity.id!!, todoEntity.description, todoEntity.finished)
+                Todo(todoEntity.id!!, todoEntity.description, todoEntity.finished, todoEntity.priority)
             }
     }
 
     override fun save(todo: Todo): Todo {
-        val created = todoJpaRepository.save(TodoEntity(todo.id, todo.description, todo.finished))
-        return Todo(created.id!!, created.description, created.finished)
+        val created = todoJpaRepository.save(TodoEntity(todo.id, todo.description, todo.finished, todo.priority))
+        return Todo(created.id!!, created.description, created.finished, created.priority)
     }
 }
