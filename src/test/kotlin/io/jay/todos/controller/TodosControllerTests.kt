@@ -132,7 +132,6 @@ class TodosControllerTests {
         fun `should return 204`() {
             every { mockTodoService.delete(1) } returns Unit
 
-
             mockMvc.perform(delete("/api/todos/1"))
                 .andExpect(status().isNoContent)
         }
@@ -141,9 +140,7 @@ class TodosControllerTests {
         fun `should call todoService`() {
             every { mockTodoService.delete(1) } returns Unit
 
-
             mockMvc.perform(delete("/api/todos/1"))
-
 
             verify { mockTodoService.delete(1) }
         }

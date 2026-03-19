@@ -2,6 +2,7 @@ package io.jay.todos.repository
 
 import io.jay.todos.entity.TodoEntity
 import io.jay.todos.model.Todo
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -19,6 +20,10 @@ class DefaultTodoRepository(private val todoJpaRepository: TodoJpaRepository) : 
     }
 
     override fun delete(id: Int) {
-        todoJpaRepository.deleteById(id)
+        try {
+            todoJpaRepository.deleteById(id)
+        } catch (e: EmptyResultDataAccessException) {
+            // ignore when todo does not exist
+        }
     }
 }
