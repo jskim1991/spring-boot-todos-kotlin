@@ -4,5 +4,6 @@ import io.jay.todos.model.Todo
 
 interface TodoRepository {
     fun findAll(): List<Todo>
+    fun findById(id: Int): Todo?
     fun save(todo: Todo): Todo
 }

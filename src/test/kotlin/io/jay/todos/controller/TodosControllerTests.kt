@@ -175,6 +175,17 @@ class TodosControllerTests {
                 .content(requestBody))
                 .andExpect(content().json(expectedJson, true))
         }
+
+        @Test
+        fun `should return 404 when todo not found`() {
+            every { mockTodoService.update(any(), any()) } throws org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND)
+
+
+            mockMvc.perform(put("/api/todos/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isNotFound)
+        }
     }
 
 }
