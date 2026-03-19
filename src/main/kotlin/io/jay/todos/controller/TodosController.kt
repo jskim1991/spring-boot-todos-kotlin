@@ -1,11 +1,14 @@
 package io.jay.todos.controller
 
+import io.jay.todos.controller.dto.AssignLabelRequest
 import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
 import io.jay.todos.service.TodoService
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,7 +23,7 @@ class TodosController(private val todoService: TodoService) {
     @GetMapping
     fun getAll(): List<TodoResponse> {
         return todoService.getAll().map {
-            TodoResponse(it.id!!, it.description, it.finished)
+            TodoResponse(it.id!!, it.description, it.finished, it.label)
         }
     }
 
@@ -28,8 +31,12 @@ class TodosController(private val todoService: TodoService) {
     @ResponseStatus(CREATED)
     fun createTodo(@RequestBody newTodoRequest: NewTodoRequest): TodoResponse {
         val created = todoService.create(newTodoRequest)
-        return TodoResponse(created.id!!, created.description, created.finished)
+        return TodoResponse(created.id!!, created.description, created.finished, created.label)
     }
 
-
+    @PatchMapping("/{id}/label")
+    fun assignLabel(@PathVariable id: Int, @RequestBody assignLabelRequest: AssignLabelRequest): TodoResponse {
+        val updated = todoService.assignLabel(id, assignLabelRequest)
+        return TodoResponse(updated.id!!, updated.description, updated.finished, updated.label)
+    }
 }
