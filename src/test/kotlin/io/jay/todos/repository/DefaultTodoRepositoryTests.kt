@@ -10,6 +10,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.util.Optional
 
 class DefaultTodoRepositoryTests {
 
@@ -50,6 +51,45 @@ class DefaultTodoRepositoryTests {
             assertThat(todo.id, equalTo(1))
             assertThat(todo.description, equalTo("Learn Kotlin"))
             assertThat(todo.finished, equalTo(true))
+        }
+    }
+
+    @Nested
+    inner class FindById {
+        @Test
+        fun `should call jpa repository to find by id`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(TodoEntity(1, "Learn Kotlin", false))
+
+
+            todoRepository.findById(1)
+
+
+            verify { mockTodoJpaRepository.findById(1) }
+        }
+
+        @Test
+        fun `should return todo when found`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.of(TodoEntity(1, "Learn Kotlin", false, "work"))
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual?.id, equalTo(1))
+            assertThat(actual?.description, equalTo("Learn Kotlin"))
+            assertThat(actual?.finished, equalTo(false))
+            assertThat(actual?.label, equalTo("work"))
+        }
+
+        @Test
+        fun `should return null when not found`() {
+            every { mockTodoJpaRepository.findById(1) } returns Optional.empty()
+
+
+            val actual = todoRepository.findById(1)
+
+
+            assertThat(actual, equalTo(null))
         }
     }
 
