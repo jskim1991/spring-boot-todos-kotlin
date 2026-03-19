@@ -1,6 +1,7 @@
 package io.jay.todos.service
 
 import io.jay.todos.controller.dto.NewTodoRequest
+import io.jay.todos.controller.dto.UpdateTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
 import io.mockk.every
@@ -78,6 +79,33 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class Update {
+        @Test
+        fun `should call repository to save`() {
+            every { mockTodoRepository.save(Todo(1, "Learn Kotlin", true)) } returns Todo(1, "Learn Kotlin", true)
+
+
+            todoService.update(1, UpdateTodoRequest("Learn Kotlin", true))
+
+
+            verify { mockTodoRepository.save(Todo(1, "Learn Kotlin", true)) }
+        }
+
+        @Test
+        fun `should return updated todo`() {
+            every { mockTodoRepository.save(any()) } returns Todo(1, "Learn Kotlin", true)
+
+
+            val actual = todoService.update(1, UpdateTodoRequest("Learn Kotlin", true))
+
+
+            assertThat(actual.id, equalTo(1))
+            assertThat(actual.description, equalTo("Learn Kotlin"))
+            assertThat(actual.finished, equalTo(true))
         }
     }
 }
