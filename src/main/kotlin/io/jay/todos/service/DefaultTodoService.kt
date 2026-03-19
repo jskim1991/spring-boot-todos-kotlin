@@ -14,4 +14,9 @@ class DefaultTodoService(private val todoRepository: TodoRepository) : TodoServi
     override fun create(newTodoRequest: NewTodoRequest): Todo {
         return todoRepository.save(Todo(newTodoRequest.description))
     }
+
+    override fun updateDescription(id: Int, description: String): Todo? {
+        val todo = todoRepository.findById(id) ?: return null
+        return todoRepository.save(Todo(todo.id, description, todo.finished))
+    }
 }
