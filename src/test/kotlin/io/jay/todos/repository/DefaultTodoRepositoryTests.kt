@@ -10,6 +10,8 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.springframework.dao.EmptyResultDataAccessException
 
 class DefaultTodoRepositoryTests {
 
@@ -80,6 +82,27 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call jpa repository to delete`() {
+            every { mockTodoJpaRepository.deleteById(1) } returns Unit
+
+            todoRepository.delete(1)
+
+            verify { mockTodoJpaRepository.deleteById(1) }
+        }
+
+        @Test
+        fun `should ignore when todo does not exist`() {
+            every { mockTodoJpaRepository.deleteById(99) } throws EmptyResultDataAccessException(1)
+
+            assertDoesNotThrow {
+                todoRepository.delete(99)
+            }
         }
     }
 }
