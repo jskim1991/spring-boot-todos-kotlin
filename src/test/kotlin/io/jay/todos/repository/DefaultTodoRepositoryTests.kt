@@ -82,4 +82,16 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.finished, equalTo(false))
         }
     }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call jpa repository to delete`() {
+            every { mockTodoJpaRepository.deleteById(1) } returns Unit
+
+            todoRepository.delete(1)
+
+            verify { mockTodoJpaRepository.deleteById(1) }
+        }
+    }
 }
