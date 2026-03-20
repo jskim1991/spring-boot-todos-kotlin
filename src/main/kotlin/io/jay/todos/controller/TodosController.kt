@@ -36,7 +36,7 @@ class TodosController(private val todoService: TodoService) {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    fun deleteTodo(@PathVariable id: Int) {
+    fun delete(@PathVariable id: Int) {
         todoService.delete(id)
     }
 
