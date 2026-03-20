@@ -3,6 +3,7 @@ package io.jay.todos.repository
 import io.jay.todos.entity.TodoEntity
 import io.jay.todos.model.Todo
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
@@ -80,6 +81,32 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call jpa repository to delete by id when found`() {
+            every { mockTodoJpaRepository.findById(1) } returns java.util.Optional.of(TodoEntity(1, "Learn Kotlin", false))
+            justRun { mockTodoJpaRepository.deleteById(1) }
+
+
+            todoRepository.delete(1)
+
+
+            verify { mockTodoJpaRepository.deleteById(1) }
+        }
+
+        @Test
+        fun `should not call jpa repository to delete when not found`() {
+            every { mockTodoJpaRepository.findById(99) } returns java.util.Optional.empty()
+
+
+            todoRepository.delete(99)
+
+
+            verify(exactly = 0) { mockTodoJpaRepository.deleteById(any()) }
         }
     }
 }
