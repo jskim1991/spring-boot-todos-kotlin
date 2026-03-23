@@ -55,6 +55,20 @@ class DefaultTodoServiceTests {
     }
 
     @Nested
+    inner class Delete {
+        @Test
+        fun `should call repository to delete`() {
+            every { mockTodoRepository.delete(1) } returns Unit
+
+
+            todoService.delete(1)
+
+
+            verify { mockTodoRepository.delete(1) }
+        }
+    }
+
+    @Nested
     inner class Create {
         @Test
         fun `should call repository to save`() {
