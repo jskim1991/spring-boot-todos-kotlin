@@ -82,4 +82,31 @@ class DefaultTodoRepositoryTests {
             assertThat(actual.finished, equalTo(false))
         }
     }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call jpa repository to delete when todo exists`() {
+            val entity = TodoEntity(1, "Learn Kotlin", false)
+            every { mockTodoJpaRepository.findById(1) } returns java.util.Optional.of(entity)
+            every { mockTodoJpaRepository.delete(entity) } returns Unit
+
+
+            todoRepository.delete(1)
+
+
+            verify { mockTodoJpaRepository.delete(entity) }
+        }
+
+        @Test
+        fun `should not call jpa repository to delete when todo does not exist`() {
+            every { mockTodoJpaRepository.findById(1) } returns java.util.Optional.empty()
+
+
+            todoRepository.delete(1)
+
+
+            verify(exactly = 0) { mockTodoJpaRepository.delete(any<TodoEntity>()) }
+        }
+    }
 }
