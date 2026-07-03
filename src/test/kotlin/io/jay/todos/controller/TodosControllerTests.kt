@@ -76,6 +76,55 @@ class TodosControllerTests {
     }
 
     @Nested
+    inner class GetById {
+        @Test
+        fun `should return 200 OK`() {
+            every { mockTodoService.getById(1) } returns Todo(1, "Learn Kotlin", true)
+
+
+            mockMvc.perform(get("/api/todos/1"))
+                .andExpect(status().isOk)
+        }
+
+        @Test
+        fun `should call todos service`() {
+            every { mockTodoService.getById(1) } returns Todo(1, "Learn Kotlin", true)
+
+
+            mockMvc.perform(get("/api/todos/1"))
+
+
+            verify { mockTodoService.getById(1) }
+        }
+
+        @Test
+        fun `should return todo`() {
+            every { mockTodoService.getById(1) } returns Todo(1, "Learn Kotlin", true)
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Learn Kotlin",
+                    "finished": true
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(get("/api/todos/1"))
+                .andExpect(content().json(expectedJson, true))
+        }
+
+        @Test
+        fun `should return 404 when not found`() {
+            every { mockTodoService.getById(1) } returns null
+
+
+            mockMvc.perform(get("/api/todos/1"))
+                .andExpect(status().isNotFound)
+        }
+    }
+
+    @Nested
     inner class CreateTodo {
         val newTodoRequest = NewTodoRequest("Learn Kotlin")
         val requestBody = objectMapper.writeValueAsString(newTodoRequest)

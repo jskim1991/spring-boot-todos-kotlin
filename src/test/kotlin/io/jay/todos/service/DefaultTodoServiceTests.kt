@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -51,6 +52,44 @@ class DefaultTodoServiceTests {
             assertThat(todo.id, equalTo(1))
             assertThat(todo.description, equalTo("Learn Kotlin"))
             assertThat(todo.finished, equalTo(true))
+        }
+    }
+
+    @Nested
+    inner class GetById {
+        @Test
+        fun `should call repository to find by id`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", true)
+
+
+            todoService.getById(1)
+
+
+            verify { mockTodoRepository.findById(1) }
+        }
+
+        @Test
+        fun `should return todo when found`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", true)
+
+
+            val actual = todoService.getById(1)
+
+
+            assertThat(actual!!.id, equalTo(1))
+            assertThat(actual.description, equalTo("Learn Kotlin"))
+            assertThat(actual.finished, equalTo(true))
+        }
+
+        @Test
+        fun `should return null when not found`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            val actual = todoService.getById(1)
+
+
+            assertThat(actual, nullValue())
         }
     }
 

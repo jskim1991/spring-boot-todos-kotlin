@@ -6,5 +6,6 @@ import io.jay.todos.model.Todo
 interface TodoService {
 
     fun getAll(): List<Todo>
+    fun getById(id: Int): Todo?
     fun create(newTodoRequest: NewTodoRequest): Todo
 }

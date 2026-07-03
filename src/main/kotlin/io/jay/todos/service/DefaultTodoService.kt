@@ -11,6 +11,10 @@ class DefaultTodoService(private val todoRepository: TodoRepository) : TodoServi
         return todoRepository.findAll()
     }
 
+    override fun getById(id: Int): Todo? {
+        return todoRepository.findById(id)
+    }
+
     override fun create(newTodoRequest: NewTodoRequest): Todo {
         return todoRepository.save(Todo(newTodoRequest.description))
     }

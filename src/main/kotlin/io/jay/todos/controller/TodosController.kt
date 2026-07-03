@@ -4,13 +4,16 @@ import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.controller.dto.TodoResponse
 import io.jay.todos.service.TodoService
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.server.ResponseStatusException
 
 @Controller
 @ResponseBody
@@ -22,6 +25,13 @@ class TodosController(private val todoService: TodoService) {
         return todoService.getAll().map {
             TodoResponse(it.id!!, it.description, it.finished)
         }
+    }
+
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Int): TodoResponse {
+        val todo = todoService.getById(id)
+            ?: throw ResponseStatusException(NOT_FOUND, "Todo with id $id not found")
+        return TodoResponse(todo.id!!, todo.description, todo.finished)
     }
 
     @PostMapping
