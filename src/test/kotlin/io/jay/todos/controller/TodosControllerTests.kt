@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -171,6 +172,38 @@ class TodosControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(content().json(expectedJson, true))
+        }
+    }
+
+    @Nested
+    inner class DeleteTodo {
+        @Test
+        fun `should return 204`() {
+            every { mockTodoService.delete(1) } returns true
+
+
+            mockMvc.perform(delete("/api/todos/1"))
+                .andExpect(status().isNoContent)
+        }
+
+        @Test
+        fun `should call todoService`() {
+            every { mockTodoService.delete(1) } returns true
+
+
+            mockMvc.perform(delete("/api/todos/1"))
+
+
+            verify { mockTodoService.delete(1) }
+        }
+
+        @Test
+        fun `should return 404 when not found`() {
+            every { mockTodoService.delete(1) } returns false
+
+
+            mockMvc.perform(delete("/api/todos/1"))
+                .andExpect(status().isNotFound)
         }
     }
 

@@ -6,4 +6,5 @@ interface TodoRepository {
     fun findAll(): List<Todo>
     fun findById(id: Int): Todo?
     fun save(todo: Todo): Todo
+    fun deleteById(id: Int)
 }

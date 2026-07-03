@@ -4,7 +4,9 @@ import io.jay.todos.controller.dto.NewTodoRequest
 import io.jay.todos.model.Todo
 import io.jay.todos.repository.TodoRepository
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -117,6 +119,55 @@ class DefaultTodoServiceTests {
             assertThat(actual.id, equalTo(1))
             assertThat(actual.description, equalTo("Learn Kotlin"))
             assertThat(actual.finished, equalTo(false))
+        }
+    }
+
+    @Nested
+    inner class Delete {
+        @Test
+        fun `should call repository to delete when todo exists`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", true)
+            every { mockTodoRepository.deleteById(1) } just runs
+
+
+            todoService.delete(1)
+
+
+            verify { mockTodoRepository.deleteById(1) }
+        }
+
+        @Test
+        fun `should return true when todo exists`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", true)
+            every { mockTodoRepository.deleteById(1) } just runs
+
+
+            val actual = todoService.delete(1)
+
+
+            assertThat(actual, equalTo(true))
+        }
+
+        @Test
+        fun `should return false when todo does not exist`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            val actual = todoService.delete(1)
+
+
+            assertThat(actual, equalTo(false))
+        }
+
+        @Test
+        fun `should not call repository to delete when todo does not exist`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            todoService.delete(1)
+
+
+            verify(exactly = 0) { mockTodoRepository.deleteById(any()) }
         }
     }
 }

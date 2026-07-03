@@ -8,4 +8,5 @@ interface TodoService {
     fun getAll(): List<Todo>
     fun getById(id: Int): Todo?
     fun create(newTodoRequest: NewTodoRequest): Todo
+    fun delete(id: Int): Boolean
 }
