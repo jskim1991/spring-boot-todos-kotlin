@@ -123,6 +123,57 @@ class DefaultTodoServiceTests {
     }
 
     @Nested
+    inner class Finish {
+        @Test
+        fun `should save todo as finished when it exists`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", false)
+            every { mockTodoRepository.save(Todo(1, "Learn Kotlin", true)) } returns Todo(1, "Learn Kotlin", true)
+
+
+            todoService.finish(1)
+
+
+            verify { mockTodoRepository.save(Todo(1, "Learn Kotlin", true)) }
+        }
+
+        @Test
+        fun `should return finished todo when it exists`() {
+            every { mockTodoRepository.findById(1) } returns Todo(1, "Learn Kotlin", false)
+            every { mockTodoRepository.save(any()) } returns Todo(1, "Learn Kotlin", true)
+
+
+            val actual = todoService.finish(1)
+
+
+            assertThat(actual!!.id, equalTo(1))
+            assertThat(actual.description, equalTo("Learn Kotlin"))
+            assertThat(actual.finished, equalTo(true))
+        }
+
+        @Test
+        fun `should return null when todo does not exist`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            val actual = todoService.finish(1)
+
+
+            assertThat(actual, nullValue())
+        }
+
+        @Test
+        fun `should not call repository to save when todo does not exist`() {
+            every { mockTodoRepository.findById(1) } returns null
+
+
+            todoService.finish(1)
+
+
+            verify(exactly = 0) { mockTodoRepository.save(any()) }
+        }
+    }
+
+    @Nested
     inner class Delete {
         @Test
         fun `should call repository to delete when todo exists`() {

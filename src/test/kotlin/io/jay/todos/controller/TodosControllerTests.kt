@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -172,6 +173,55 @@ class TodosControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(content().json(expectedJson, true))
+        }
+    }
+
+    @Nested
+    inner class FinishTodo {
+        @Test
+        fun `should return 200 OK`() {
+            every { mockTodoService.finish(1) } returns Todo(1, "Learn Kotlin", true)
+
+
+            mockMvc.perform(put("/api/todos/1/finish"))
+                .andExpect(status().isOk)
+        }
+
+        @Test
+        fun `should call todoService`() {
+            every { mockTodoService.finish(1) } returns Todo(1, "Learn Kotlin", true)
+
+
+            mockMvc.perform(put("/api/todos/1/finish"))
+
+
+            verify { mockTodoService.finish(1) }
+        }
+
+        @Test
+        fun `should return finished todo`() {
+            every { mockTodoService.finish(1) } returns Todo(1, "Learn Kotlin", true)
+
+            val expectedJson = """
+                {
+                    "id": 1,
+                    "description": "Learn Kotlin",
+                    "finished": true
+                }
+            """.trimIndent()
+
+
+            mockMvc.perform(put("/api/todos/1/finish"))
+                .andExpect(content().json(expectedJson, true))
+        }
+
+        @Test
+        fun `should return 404 when not found`() {
+            every { mockTodoService.finish(1) } returns null
+
+
+            mockMvc.perform(put("/api/todos/1/finish"))
+                .andExpect(status().isNotFound)
         }
     }
 

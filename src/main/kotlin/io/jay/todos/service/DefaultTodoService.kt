@@ -19,6 +19,11 @@ class DefaultTodoService(private val todoRepository: TodoRepository) : TodoServi
         return todoRepository.save(Todo(newTodoRequest.description))
     }
 
+    override fun finish(id: Int): Todo? {
+        val todo = todoRepository.findById(id) ?: return null
+        return todoRepository.save(todo.copy(finished = true))
+    }
+
     override fun delete(id: Int): Boolean {
         if (todoRepository.findById(id) == null) {
             return false

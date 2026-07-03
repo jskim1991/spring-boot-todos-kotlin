@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
@@ -41,6 +42,13 @@ class TodosController(private val todoService: TodoService) {
     fun createTodo(@RequestBody newTodoRequest: NewTodoRequest): TodoResponse {
         val created = todoService.create(newTodoRequest)
         return TodoResponse(created.id!!, created.description, created.finished)
+    }
+
+    @PutMapping("/{id}/finish")
+    fun finishTodo(@PathVariable id: Int): TodoResponse {
+        val todo = todoService.finish(id)
+            ?: throw ResponseStatusException(NOT_FOUND, "Todo with id $id not found")
+        return TodoResponse(todo.id!!, todo.description, todo.finished)
     }
 
     @DeleteMapping("/{id}")
